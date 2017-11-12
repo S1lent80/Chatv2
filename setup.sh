@@ -40,6 +40,57 @@ function writeConfigFile()
 	fi
 }
 
+# ***********************************************************************************************
+function install()
+{
+	if [ "$1" == "" ] && [ "$2" == "" ]; then
+		echo -e "${blue}->${ce}${gs} I need something to install...${ce}"
+	else
+		if [[ ${ID} == "debian" ]] || [[ ${ID} == "linuxmint" ]] || [[ ${ID} == "ubuntu" ]] || [[ ${ID} == "zorin" ]] || [[ ${ID} == "zorinos" ]] || [[ ${ID} == "parrot" ]]; then
+			if [[ "$2" == "quiet" ]]; then
+				echo -e "${blue}=>${ce}${gs} Installing deps for Debian/Ubuntu (and derivents)...${ce}"
+				echo -e "${ys}\t->${ce}${gs} Quiet mode enabled...${ce}\n"
+				apt-get install -qq "$1"
+				if [[ "$?" != 1 ]]; then
+					echo -e "${gs}=>${ce}${ys} Operation [ install ] completed...${ce}"
+				else
+					echo -e "${minus}${gs}Could not complete operation: [ install ]...${ce}"
+				fi
+			else
+				echo -e "${blue}=>${ce}${gs} Installing deps for Debian/Ubuntu (and derivents)...${ce}"
+				echo -e "${ys}\t->${ce}${gs} Quiet mode disabled...${ce}\n"
+				apt-get install "$1"
+				if [[ "$?" != 1 ]]; then
+					echo -e "${gs}=>${ce}${ys} Operation [ install ] completed...${ce}"
+				else
+					echo -e "${minus}${gs}Could not complete operation: [ install ]...${ce}"
+				fi
+			fi
+		elif [[ ${ID} == "arch" ]] || [[ ${ID} == "manjaro" ]]; then
+			if [[ "$2" == "quiet" ]]; then
+				echo -e "${blue}=>${ce}${gs} Installing deps for Arch Linux (and derivents)...${ce}"
+				echo -e "${ys}\t->${ce}${gs} Quiet mode enabled...${ce}\n"
+				pacman -Sq --force "$1"
+				if [[ "$?" != 1 ]]; then
+					echo -e "${gs}=>${ce}${ys} Operation [ install ] completed...${ce}"
+				else
+					echo -e "${minus}${gs}Could not complete operation: [ install ]...${ce}"
+				fi
+			else
+				echo -e "${blue}=>${ce}${gs} Installing deps for Arch Linux (and derivents)...${ce}"
+				echo -e "${ys}\t->${ce}${gs} Quiet mode disabled...${ce}\n"
+				pacman -S --force "$1"
+				if [[ "$?" != 1 ]]; then
+					echo -e "${gs}=>${ce}${ys} Operation [ install ] completed...${ce}"
+				else
+					echo -e "${minus}${gs}Could not complete operation: [ install ]...${ce}"
+				fi
+			fi
+		fi 
+	fi
+}
+# ***********************************************************************************************
+
 # Generate the main ffiles and directories in the /opt directory
 # -> /opt/chat
 # -> /opt/chat/config
@@ -103,10 +154,16 @@ function genMainDirectories()
 	fi
 }
 
+# Install needec dependencies
+function installNeedDep()
+{
+
+}
+
 # Get system information
 function getSysInfo()
 {
-	
+
 }
 
 genMainDirectories
