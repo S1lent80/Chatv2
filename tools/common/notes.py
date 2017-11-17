@@ -48,6 +48,12 @@ class NotesCommon:
     def _co_generateConfig(self, filename):
         pass
 
+    def _co_interactiveMode(self):
+        self.autoDetectDir = False
+        self.autoDetectNoteName = False
+        pass
+
+
 
 def main():
     # Class setup
