@@ -1,0 +1,51 @@
+#!/bin/bash
+
+## Configurations ##
+UBUNTU_CODENAME="zesty"
+VERSION="1.0"
+KEY_SERVER="keyserver.ubuntu.com"
+
+function print_info()
+{
+	echo -e "\033[32mUtility to add PPA repositories to your Debian (or derative) machine...\033[0m"
+	echo -e "\033[32mUsage:\033[0m\033[33m $0 ppa:user/ppa-name\033[0m\n"
+	exit 0
+}
+
+if [ $# -eq 1 ]
+NM=`uname -a && date`
+NAME=`echo ${NM} | md5sum | cut -d" " -f1`
+then
+	ppa_name=`echo "$1" | cut -d":" -f2 -s`
+	if [ -z ${ppa_name} ]
+	then
+		echo -e "\n\033[33mPPA name not found\033[0m\n"
+		print_info
+	else
+		echo -e "\033[32mPPA:\033[0m\033[33m ${ppa_name}\033[0m"
+		echo -e "\033[32mCodename:\033[0m\033[33m ${UBUNTU_CODENAME}\033[0m\n"
+		echo -e "\033[34m[*]\033[0m\033[32m Writing to /etc/apt/sources.list.d/${ppa_name}.list...\033[0m"
+		echo "deb http://ppa.launchpad.net/$ppa_name/ubuntu ${UBUNTU_CODENAME} main" >> /etc/apt/sources.list
+		echo -e "\033[34m[*]\033[0m\033[32m Updating system...\033[0m\n"
+		apt-get update >> /dev/null 2> /tmp/${NAME}_apt_add_key.txt
+		if [[ $? != 1 ]]; then
+			echo -e "\n\033[32mSuccess...\033[0m"
+		else
+			echo -e "\n\033[31m[-]\033[0m\033[32m Could not update system...\033[0m\n"
+			exit 1
+		fi 
+		key=`cat /tmp/${NAME}_apt_add_key.txt | cut -d":" -f6 | cut -d" " -f3`
+		# Add the key
+		echo -e "\033[34m[*]\033[0m\033[32m Adding key:\033[0m\033[33m ${key}...\033[0m\n"
+		apt-key adv --keyserver ${KEY_SERVER} --recv-keys ${key}
+		if [[ $? != 1 ]]; then
+			echo -e "\033[32mSuccessfully added key(s):\033[0m\033[33m ${key}...\033[0m\n"
+			rm -rf /tmp/${NAME}_apt_add_key.txt
+		else
+			echo -e "\n\033[31m[-]\033[0m\033[32m Could not add key(s):\033[0m\033[33m ${key}...\033[0m\n"
+			exit 1
+		fi
+	fi
+else
+	print_info
+fi
