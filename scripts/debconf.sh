@@ -29,7 +29,8 @@ fi
 if [ -d ${REPO_DIR} ] && [ -d ${DIR_FULL} ]; then
 	echo -e "${astk}${gs}Found directory: ${DIR_FULL}...${ce}"
 	echo -e "${astk}${gs}Writing to: ${DIR_FULL}/Packages.gz...${ce}\n"
-	dpkg-scanpackages ${DIR_FULL} | gzip -9c > ${DIR_FULL}/Packages.gz
+	cd ${REPO_DIR}; dpkg-scanpackages ${OS_TYPE}/${ARCH} | gzip -9c > ${OS_TYPE}/${ARCH}/Packages.gz
+	# dpkg-scanpackages ${DIR_FULL} | gzip -9c > ${DIR_FULL}/Packages.gz
 	if [[ $? != 1 ]]; then
 		echo -e "\n${plus}${ys}Success...${ce}"
 	else
