@@ -1,63 +1,68 @@
 #!/bin/bash
 
-MAIN_DIR="/var/www/html/debs"
-ARCH="amd64"
+QUIET=0
+
+## Dir variables ##
+REPO_DIR="/var/www/html/s1"
 OS_TYPE="debian"
-FULL_DIR="${MAIN_DIR}/${ARCH}/${OS_TYPE}"
+ARCH="amd64"
+DIR_FULL="${REPO_DIR}/${OS_TYPE}/${ARCH}"
 
-# Check if the user is running in root
+## Variables ##
+gs="\033[32m"
+rs="\033[31m"
+ys="\033[33m"
+blue="\033[34m"
+ce="\033[0m"
+# -> Patterns
+plus="${gs}[+]${ce} "
+minus="${rs}[-]${ce} "
+astk="${blue}[*]${ce} "
+
+# Check if the user is in root
 if [ "$(id -u)" != "0" ]; then
-	echo -e "\n\033[31m[-]\033[0m\033[32m Please run this script in root...\033[0m\n" 2>&1
+	echo -e "\n${minus}${gs}Please run this script as root...${ce}\n" 2>&1
 	exit 1
-fi 
+fi
 
-if [ -d "${FULL_DIR}" ]; then
-	# Scan the package directories
-	echo -e "\n\033[34m[*]\033[0m\033[32m Scanning packages in \"${ARCH}/${OS_TYPE}\"...\033[0m\n"
-	dpkg-scanpackages ${FULL_DIR} | gzip -9c > ${FULL_DIR}/Packages.gz
+## Main program ##
+if [ -d ${REPO_DIR} ] && [ -d ${DIR_FULL} ]; then
+	echo -e "${astk}${gs}Found directory: ${DIR_FULL}...${ce}"
+	echo -e "${astk}${gs}Writing to: ${DIR_FULL}/Packages.gz...${ce}\n"
+	dpkg-scanpackages ${DIR_FULL} | gzip -9c > ${DIR_FULL}/Packages.gz
 	if [[ $? != 1 ]]; then
-		echo -e "\n\033[32mSuccess...\033[0m\n"
+		echo -e "\n${plus}${ys}Success...${ce}"
 	else
-		echo -e "\n\033[31m[-]\033[0m\033[32m Could not scan packages in \"${ARCH}/${OS_TYPE}\"...\033[0m\n"
+		echo -e "\n${minus}${gs}Could not write to: ${DIR_FULL}/Packages.gz...${ce}\n"
 		exit 1
 	fi
-
-	# Write to s1.list
-	echo -e "\033[34m[*]\033[0m\033[32m Writing to /etc/apt/sources.list.d/s1.list...\033[0m"
-	if [[ -f "/etc/apt/sources.list.d/s1.list" ]]; then
-		echo -e "\n\033[32mApt file: s1.list exists...\033[0m"
-		if [[ `grep "deb http://127.0.0.1/debs amd64/debian/" /etc/apt/sources.list` ]]; then
-			echo -e "\033[32mRepository URL exists in /etc/apt/sources.list...\033[0m\n"
-		else
-			# Prompt the user
-			echo -e "\n"
-			read -p "Add the s1 repo to /etc/apt/sources.list? [Y|y|N|n]: " choice
-			if [[ ${choice} == "Y" ]] || [[ ${choice} == "y" ]]; then
-				echo "deb http://127.0.0.1/debs amd64/debian/" >> /etc/apt/sources.list
-			elif [[ ${choice} == "N" ]] || [[ ${choice} == "n" ]]; then
-				echo -e "\n\033[32mNot adding s1 repo to /etc/apt/sources.list...\033[0m\n"
-			else
-				echo ""
-			fi
-		fi
+	
+	# Check if entry is already present in /etc/apt/sources.list
+	if [[ `grep "deb http://127.0.0.1/s1 debian/amd64/" /etc/apt/sources.list` ]]; then
+		echo -e "${astk}${gs}Repository entry exists in /etc/apt/sources.list...${ce}"
 	else
-		# echo "deb http://127.0.0.1/debs amd64/debian/" > /etc/apt/sources.list.d/s1.list
-		if [[ `grep "deb http://127.0.0.1/debs amd64/debian/" /etc/apt/sources.list` ]]; then
-			echo -e "\033[32mRepository URL exists in /etc/apt/sources.list...\033[0m\n"
-		else
-			echo "deb http://127.0.0.1/debs amd64/debian/" >> /etc/apt/sources.list
-		fi
+		echo -e "${astk}${gs}Adding repository entry to /etc/apt/sources.list...${ce}"
+		echo "deb http://127.0.0.1/s1 debian/amd64/" >> /etc/apt/sources.list
 	fi
-
+	
 	# Update the system
-	apt-get update 
-	if [[ $? != 1 ]]; then
-		echo -e "\n\033[32mSuccess...\033[0m\n"
+	echo -e "${astk}${gs}Updating the system...${ce}"
+	
+	# Check quiet mode boolean
+	if [[ ${QUIET} == 1 ]]; then
+		apt-get -qq update
 	else
-		echo -e "\n\033[31m[-]\033[0m\033[32m Unable to update the system...\033[0m\n"
+		apt-get update
+	fi
+	
+	if [[ $? != 1 ]]; then
+		echo -e "\n${gs}Success...${ce}\n"
+	else
+		echo -e "\n${minus}${gs}Could not update system...${ce}\n"
 		exit 1
 	fi
 else
-	echo -e "\n\033[31m[-]\033[0m\033[32m Could not find directory: ${FULL_DIR}...\033[0m\n"
+	echo -e "\n${minus}${gs}Could not find directory: ${DIR_FULL}...${ce}\n"
 	exit 1
 fi
+
