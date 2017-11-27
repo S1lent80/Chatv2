@@ -16,25 +16,43 @@ plus = gs + "[+] " + ce
 minus = rs + "[-] " + ce
 astk = blue + "[*] " + ce
 
-def main():
-    while True:
-        # Command line prompt
-        try:
-            cmd = raw_input(gs + "[ " + ce + ys + "cmd" + ce + gs + " ]> " + ce)
-            pass
-        except KeyboardInterrupt:
-            print '\n'
-            break
+# -----------------------------------------------------
+class CommandUtils:
 
-        # ----------------------------------------------------------------------------------------------
-        # Regular expression: search
-        cmd_ls = re.search("list", cmd, re.I | re.M)
-
-        # ----------------------------------------------------------------------------------------------
-        # Commands
-        if cmd_ls:
-            os.system('ls /' + cmd[6:])
-            pass
+    def _help(self):
+        pass
 
 
-        # ----------------------------------------------------------------------------------------------
+class Commands:
+
+    def cmd(self):
+        # Variables
+
+
+        # Main console
+        while True:
+            try:
+                cmd = raw_input(gs + "[ cmd ]> " + ce)
+                pass
+            except KeyboardInterrupt:
+                print "\n"
+                break
+            str = cmd.split(' ')
+            str1 = cmd.split(':')
+
+            # Command ls
+            if str[0] in ['ls', 'list']:
+                try:
+                    print "\n"
+                    os.system("ls --color=auto " + str[1])
+                    print "\n"
+                except:
+                    print ''
+                    os.system('ls --color=auto')
+                    print ''
+
+            if cmd in ['exit','back']:
+                print "\n"
+                break
+
+

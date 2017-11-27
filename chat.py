@@ -3,107 +3,107 @@ import sys
 import re
 import tqdm
 import time
-from tqdm import *
+import command
+from tqdm import tqdm
 from time import sleep
 
-sys.path.insert(0,"modules/python/config")
-import sys_config
+sys.path.insert(0, "modules/python/config")
+import config
 
-## Chat main module - Version: 1-1.8.9 ##
+sys.path.insert(0, "tools/common/notes");
 
-# =========================================================================================================
-# Variables - Program
-console_prompt = sys_config.chat_prompt
-version = ""
-file_store = "/opt/chat/file_store.txt"
-main_dir = sys_config.dir_main
+
+## Chatv2 Remake: 2 - Version: 1 ##
+
+# *******************************************************************************************************
+# Variables
+name = config.name
+prompt_1 = config.prompt
 # -> Colors
 gs = "\033[32m"
 rs = "\033[31m"
 ys = "\033[33m"
 blue = "\033[34m"
 ce = "\033[0m"
-# Colors:Patterns
+# -> Patterns
 plus = gs + "[+] " + ce
 minus = rs + "[-] " + ce
 astk = blue + "[*] " + ce
-# =========================================================================================================
-# Classes and functions
-class Command:
-    ## Command class ##
 
-    def _cmdCreateHistFile(self,filename, prompt_object):
+# *******************************************************************************************************
+# Classes and functions
+class MainCommand:
+
+    def createHistFile(self, filename, prompt_object):
         with open(filename, "a+") as hist_file:
             hist_file.write(prompt_object + "\n")
             hist_file.close()
 
-    def _cmdHistFile(self,filename):
-        print "\n" + ys + "Command history:" + ce
-        print "=" * 16,"\n"
-        os.system("cat " + filename)
-        print "\n"
+    def showHistFile(self, filename):
+        print '\n'
+        print ys + "Command history:" + ce
+        print "=" * 16
+        os.system('cat ' + filename)
+        print '\n'
+        pass
 
-# =========================================================================================================
+
+# *******************************************************************************************************
+# Class declarations
+cmd1 = MainCommand()
+cmd2 = command.Commands()
+
+# *******************************************************************************************************
 # Loading bar
 os.system('clear')
-print "[ Loading ]...\n"
+print "[ Loading... ]\n"
 for x in tqdm(range(100)):
     sleep(0.05)
 os.system('clear')
-# =========================================================================================================
+
+# *******************************************************************************************************
 # Banners and greeters
 
 
-# =========================================================================================================
-# Class declarTION
-cmd = Command()
-
-# =========================================================================================================
+# *******************************************************************************************************
 # Main program
 while True:
     # Give the user a prompt
     try:
-        prompt = raw_input(blue + "[ " + ce + gs + console_prompt + ce + blue + " ]" + ce + ": ")
+        prompt = raw_input(gs + "[ " + ce + ys + prompt_1 + ce + gs + " ]: " + ce)
+        pass
     except KeyboardInterrupt:
-        # Print a message then exit the program
-        print "\n"
-        sys.exit(1)
+        # Print an exit message
+        print '\n'
+        break
 
-    ## History file ##
-    cmd._cmdCreateHistFile(file_store, prompt)
+    cmd1.createHistFile("/opt/chat/hist_file.txt", prompt)
 
-
-    # -----------------------------------------------------------------------------------------------------
-    # Reg->cmd
-    cmd_exit = re.search("exit",prompt,re.I|re.M)
-    cmd_list = re.search("list",prompt,re.I|re.M)
-    cmd_ehx = re.search("encode",prompt,re.I|re.M)
-    cmd_dhx = re.search("decode",prompt,re.I|re.M)
-    dhx_hex = re.search("hex",prompt,re.I|re.M)
-    dhx_64 = re.search("base64",prompt,re.I|re.M)
+    # ---------------------------------------------------------------------------------------------------
+    # Regular expression: search
+    cmd_exit = re.search("exit", prompt, re.I|re.M)
+    cmd_command = re.search("cmd", prompt, re.I|re.M)
+    cmd_command_alt = re.search("command", prompt, re.I|re.M)
 
 
+    # ---------------------------------------------------------------------------------------------------
+    # Commands
     if cmd_exit:
-        # Print a message then exit
-        sys.exit(0)
-    # -----------------------------------------------------------------------------------------------------
-    # Show history command
-    if prompt in ['show history','show_history','command_history','cmd_history']:
-        cmd._cmdHistFile(file_store)
+        # Print an exit message
+        break
+
+    elif prompt in ['show history', 'show_history', 'history']:
+        cmd1.showHistFile("/opt/chat/hist_file.txt")
         pass
 
-    # -----------------------------------------------------------------------------------------------------
-    # System commands (altered)
-    if cmd_list:
-        os.system('ls /' + prompt[6:])
-        pass
-
-    # -----------------------------------------------------------------------------------------------------
-    if cmd_ehx and dhx_hex:
-        os.system('python ' + sys_config.e_hex_file)
+    elif cmd_command or cmd_command_alt:
+        cmd2.cmd()
         pass
 
 
     else:
-        print "\n" + gs + "I cannot find the command: [ " + ce + ys + prompt + ce + gs + " ]..." + ce + "\n"
+        print "\n" + gs + "I could not find the command/phrase [ " + ce + ys + prompt + ce + gs + " ]..." + ce + "\n"
         pass
+
+
+    # ---------------------------------------------------------------------------------------------------
