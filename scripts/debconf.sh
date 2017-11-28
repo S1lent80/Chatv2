@@ -39,11 +39,11 @@ if [ -d ${REPO_DIR} ] && [ -d ${DIR_FULL} ]; then
 	fi
 	
 	# Check if entry is already present in /etc/apt/sources.list
-	if [[ `grep "deb http://127.0.0.1/s1 debian/amd64/" /etc/apt/sources.list` ]]; then
-		echo -e "${astk}${gs}Repository entry exists in /etc/apt/sources.list...${ce}"
+	if [[ -f "/etc/apt/sources.list.d/s1.list" ]]; then
+		echo -e "${astk}${gs}File \"s1.list\" exists in /etc/apt/sources.list.d...${ce}"
 	else
-		echo -e "${astk}${gs}Adding repository entry to /etc/apt/sources.list...${ce}"
-		echo "deb http://127.0.0.1/s1 debian/amd64/" >> /etc/apt/sources.list
+		echo -e "${astk}${gs}Adding file \"s1.list\" to /etc/apt/sources.list.d...${ce}"
+		echo "deb [trusted=true] http://127.0.0.1/s1 debian/amd64/" > /etc/apt/sources.list.d/s1.list
 	fi
 	
 	# Update the system
