@@ -1,6 +1,6 @@
 #!/bin/bash
 
-QUIET=0
+QUIET=1
 
 ## Dir variables ##
 REPO_DIR="/var/www/html/s1"
