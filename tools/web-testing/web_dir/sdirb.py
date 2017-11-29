@@ -24,9 +24,9 @@ minus = rs + "[-] " + ce
 astk = blue + "[*] " + ce
 
 ## Variables:Main ##
-rhost = sys.argv[1]
-wordlist = sys.argv[2]
-port = sys.argv[3]
+rhost = sys.argv[1:]
+wordlist = sys.argv[1:]
+port = 80
 
 class SDirbMain():
 
@@ -40,40 +40,40 @@ class SDirbMain():
 
 
     def _checkHostConnection(self, rhost):
-        print astk + gs + "Checking connection to RHOST: " + ce + ys + rhost + ce + gs + "..." + ce
+        print astk + gs + "Checking connection to RHOST: " + ce + ys,rhost,ce + gs + "..." + ce
+	global sock
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        global sock
 
         # Check the connection
         try:
-            stat = sock.connect_ex((rhost, port))
+            stat = sock.connect_ex((str(rhost), int(port)))
             sock.close()
             if stat == 0:
                 print plus + ys + "Successfully connected to rhost..." + ce
                 pass
             else:
-                print minus + gs + "Could not connect to rhost: " + ce + ys + rhost + ce + gs + "..." + ce
+                print minus + gs + "Could not connect to rhost: " + ce + ys,rhost,ce + gs + "..." + ce
                 sys.exit(1)
         except socket.error as e:
             print rs + "[X] " + ce + gs + "Program error: " + str(e) + ce
             sys.exit(1)
 
     def _readWordList(self, wordlist):
-        print astk + gs + "Parsing wordlist: " + ce + ys + wordlist + ce + gs + "..." + ce
+        print astk + gs + "Parsing wordlist: " + ce + ys,wordlist,ce + gs + "..." + ce
         # Open the file for reading
         try:
             with open(wordlist) as file:
+		global chk_file
                 chk_file = file.read().strip().split('\n')
-                global chk_file
             print plus + ys + "Successfully parsed wordlist..." + ce
         except IOError as e:
-            print minus + gs + "Could not parse file: " + wordlist + " - Error: " + str(e) + ce
+            print minus + gs + "Could not parse file: ",wordlist," - Error: " + str(e) + ce
             sys.exit(1)
 
     def webPathScrape(self, path):
         print astk + gs + "Init web response/request..." + ce + "\n"
         try:
-            response = requests.get(rhost + "/" + path).status_code
+            response = requests.get(rhost,"/" + path).status_code
         except Exception as e:
             print minus + gs + "Error -> " + ce + ys + str(e) + ce
             sys.exit(1)
@@ -93,6 +93,7 @@ class SDirbMain():
 
 def main():
     sdirb = SDirbMain()
+    sdirb._checkParam(rhost,wordlist,port)
 
     sdirb._checkParam(rhost, wordlist, port)
     sdirb._checkHostConnection(rhost)
