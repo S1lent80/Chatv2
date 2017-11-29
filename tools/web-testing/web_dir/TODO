@@ -1,0 +1,5 @@
+- Better param checking machenism
+- Directory check (recrusive)
+- File check (Recrusive, interesting files)
+  -> Extensions: .html, .php, .js, .asp, .aspx, etc
+ 
