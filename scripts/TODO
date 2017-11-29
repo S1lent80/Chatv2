@@ -1,0 +1,4 @@
+- Add default repository (Debian/Binary) directories [a-z] Python, Ruby, Perl
+- Work on (Shell Script) ppa(2) script
+  -> Show keys
+  -> Add the ppa repo
