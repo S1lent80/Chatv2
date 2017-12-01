@@ -61,7 +61,7 @@ class SPM:
             pass
 
         # Write to the config file
-        with open("config.spm", "w") as configfile:
+        with open("config.spm.1", "w") as configfile:
             config.write(configfile)
             pass
 
