@@ -48,6 +48,7 @@ class SPM:
         config['Default:'] = {'MainUrl': 'http://127.0.0.1/s1',
                               'MainPort': 80,
                               'MainOS': '',
+                              'Arch': 'amd64'
                               }
         if platform.dist() in ['Kali', 'Debian']:
             config['Default:']['MainOS'] = 'debian'
@@ -63,4 +64,15 @@ class SPM:
         with open("config.spm", "w") as configfile:
             config.write(configfile)
             pass
-        
+
+    """
+    Grab the package and get package arch compression type
+    This can be: .deb, .tar.<ARCH>, .rpm
+    Then if it is a .tar.<ARCH>, then extract the archive and look for these files:
+    -> configure, Makefile
+    -> autogen
+    -> Rakefile, Gemfile
+    If the package is a python related package, look for the required file and pull contents from it
+    If there are dependencies that need to be resolved get the error with dependencies and try to install them
+    """
+    
